@@ -121,3 +121,66 @@ float XY(String serialString){
 
   return xCoordinateFloat,yCoordinateFloat;
 }
+
+void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coordinate, float last_Y_coordinate){
+
+  // Gets the difference between the current position and the desired one
+  float toCoordinateX = xCoordinateFloat - last_X_coordinate;
+  float toCoordinateY = yCoordinateFloat - last_Y_coordinate;
+
+  // The code for the map function -> how many steps to move 1 millimiter etc
+
+  // Chekcs to see if the desired coordinate is already the curret one. If so, move just the Y motor
+  if (toCoordinateX == 0 ){
+    Serial.println("Stay in the same x coordinate, move only the y Axis");
+    //Move Y motor to position
+
+    if (toCoordinateY < 0){
+      //move counter clockwise to position
+      Serial.println("Move the y motor counter clockwise to position");
+    }
+
+    else{
+      //move clockwise to position
+      Serial.println("Move the Y motor clockwise to position");
+    }
+
+  }
+
+  // Chekcs to see if the desired coordinate is already the curret one. If so, move just the X motor
+  else if (toCoordinateY == 0){
+    Serial.println("Stay in the same Y coordinate, move only x Axis");
+    //Move X Motor
+
+    if(toCoordinateX<0){
+      Serial.println("Move the X motor counter clockwise to position");
+
+    }
+
+    else{
+      Serial.println("Move motor clock wise to position");
+    }
+
+  }
+
+  // If both are different, move both simultaneously
+  else{
+
+    // Checks to see which of the motors will have to run the longest
+    if (toCoordinateX > toCoordinateY){
+      // do something
+    
+    }
+    else if (toCoordinateX < toCoordinateY){
+      // do something
+    }
+    else if (toCoordinateX == toCoordinateY){
+
+    }
+
+  }
+
+
+
+
+}
