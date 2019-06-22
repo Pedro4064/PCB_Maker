@@ -8,9 +8,12 @@ String status;
 float xCoordinateFloat;
 float yCoordinateFloat;
 
+int LED = 13;
 
 void setup(){
+
 Serial.begin(9600);
+pinMode(LED,OUTPUT);
 
 }
 
@@ -27,15 +30,27 @@ void loop(){
         serialString.remove(0,1);
         Z(serialString);
 
+        // Sends a signal to the raspberry pi to tell it ot send the next line
+        digitalWrite(LED,HIGH);
+        delay(10);
+        digitalWrite(LED,LOW);
+
+
     }
 
-    else if (serialString[0] == "X"){
+    else if (serialString[0] == 'X'){
 
         xCoordinateFloat,yCoordinateFloat = XY(serialString);
 
+        // Sends a signal to the raspberry pi to tell it ot send the next line
+        digitalWrite(LED,HIGH);
+        delay(10);
+        digitalWrite(LED,LOW);
+
+
+
     }
-    // serialString.remove(0,1);
-    // Serial.println(serialString);
+    
   }
 
 }

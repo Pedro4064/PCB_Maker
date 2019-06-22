@@ -65,7 +65,7 @@ void Encoder::zeroCounter(){
 void Z(String serialString){
 
   float coordinate = serialString.toFloat();
-  Serial.println(coordinate);
+  // Serial.println(coordinate);
 
   if (coordinate>0){
       Serial.println("It is a Z coordinate...moving servo/pen up");
@@ -81,6 +81,8 @@ void Z(String serialString){
 float XY(String serialString){
 
   int stringLength = serialString.length();
+//  Serial.print("The string size is");
+//  Serial.println(serialString.length());
   int yPosition = 0;
 
   // The string versions of the Y and X coordinates
@@ -94,7 +96,7 @@ float XY(String serialString){
   // Goes through the length of the string and find the Y position, so we can formate and devide the x from the Y coordinate
   for (int i = 0; i <= stringLength; i++) {
 
-    if (serialString[i] == "Y"){
+    if (serialString[i] == 'Y'){
         yPosition = i;
         // Serial.println("The Y positio")
     }
@@ -103,7 +105,7 @@ float XY(String serialString){
 
   //Creates a substring from the original string (serialString) by deviding the string in the "Y" character
   xCoordinate = serialString.substring(1,yPosition-1);//-1 so it doesn't include the "Y" character
-  yCoordinate = serialString.substring(yPosition+1);  //+1 so it doesn't include the "Y" character
+  yCoordinate = serialString.substring(yPosition+1,stringLength);  //+1 so it doesn't include the "Y" character
 
   //Add those velues to their float counterparts
   xCoordinateFloat = xCoordinate.toFloat();
@@ -113,8 +115,9 @@ float XY(String serialString){
   Serial.print(xCoordinateFloat);
   Serial.println();
 
-  Serial.println("The y coordinate is ");
-  Serial.println(yCoordinateFloat);
+  Serial.print("The y coordinate is ");
+  Serial.print(yCoordinateFloat);
+  Serial.println();
 
   return xCoordinateFloat,yCoordinateFloat;
 }
