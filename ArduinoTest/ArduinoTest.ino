@@ -1,18 +1,5 @@
 #include "header.h"
 
-String serialString;
-String status;
-
-//X,Y coordinates
-float xCoordinate_Float;
-float yCoordinate_Float;
-
-//Current coordinates
-float lastX_coordinate = 0.000;
-float lastY_coordinate = 0.000;
-
-int LED = 13;
-bool next  = false;
 
 void setup(){
 
