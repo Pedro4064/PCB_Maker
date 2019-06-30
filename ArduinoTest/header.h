@@ -235,14 +235,48 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
     // Both of them are equal, so move them all at once, all the way
     else if (modulo_of_X == modulo_of_Y){
       
-      for (float i = 0; i = numberOfStepsX; i++){
-        // Move both motors until the end
-      }
+     // Checks to see if both are positive values, if so, move both clockwise, but the same amount of steps1
+     if (toCoordinateX>0 && toCoordinateY>0){
+        for (float i = 0; i = numberOfStepsY; i++){
+          //Move both motors until the yMotor gets to the position, then only move the X motor
+          xMotor->step(i,FORWARD,SINGLE);
+          yMotor->step(i,FORWARD,SINGLE);
+        }
+          
+     }
+
+      // Checks to see if both are negative values, if so, move both counter clockwise, but the same amount of steps
+     else if (toCoordinateX<0 && toCoordinateY<0){
+        for (float i = 0; i = numberOfStepsY; i++){
+          xMotor->step(i,BACKWARD,SINGLE);
+          yMotor->step(i,BACKWARD,SINGLE);
+        }
+        
+     }
+
+      // Move the x clockwise and the y counter clockwise, but the same amount of steps 
+     else if (toCoordinateX>0 && toCoordinateY<0){
+        for (float i = 0; i = numberOfStepsY; i++){
+          xMotor->step(i,FORWARD,SINGLE);
+          yMotor->step(i,BACKWARD,SINGLE);
+        }
+        
+
+     }
+
+      // move the x counter clockwise and the y clockwise, but the same amount of steps
+     else if (toCoordinateX<0 && toCoordinateY>0){
+        for (float i = 0; i = numberOfStepsY; i++)
+        {
+          xMotor->step(i,BACKWARD,SINGLE);
+          yMotor->step(i,FORWARD,SINGLE);
+        }
+        
+
+     }
       
 
     }
-
-  
 
   }
 }
