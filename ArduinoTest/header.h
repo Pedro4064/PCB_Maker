@@ -11,8 +11,26 @@ Servo zServo;
 Adafruit_StepperMotor *xMotor = AFMS.getStepper(200, 2);// to motor port #2 (M3 and M4)
 Adafruit_StepperMotor *yMotor = AFMS.getStepper(200, 1);// I think port #1 (M1 and M2)
 
+//////////////////////////Variables //////////////////////////
 
-// Math functions
+
+String serialString;
+String status;
+
+//X,Y coordinates
+float xCoordinate_Float;
+float yCoordinate_Float;
+
+//Current coordinates
+float lastX_coordinate = 0.000;
+float lastY_coordinate = 0.000;
+
+int LED = 13;
+bool next  = false;
+
+
+//////////////////////////Math functions//////////////////////////
+
 float Modulo(float a, float b){
 
   if (a>0){
@@ -32,7 +50,8 @@ float Modulo(float a, float b){
   return a,b;
 }
 
-//Plotting Functions
+//////////////////////////Plotting Functions//////////////////////////
+
 void Z(String serialString){
 
   float coordinate = serialString.toFloat();
@@ -106,8 +125,8 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
   // The number of steps to move the whole sistem one milimiter -> have to check by building every thing, trial and error 
   // Example --- for one milimiter the motor needs to do 200 steps, so the numberOfStepsX = 200
-  float numberOfStepsX = 0;
-  float numberOfStepsY = 0;
+  float numberOfStepsX,numberOfStepsY = 0;
+  
 
   // Calculate the number of steps based on the numberOfStepsX and numberOfStepsY
   numberOfStepsX = numberOfStepsX*modulo_of_X;
@@ -279,4 +298,5 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
     }
 
   }
+
 }
