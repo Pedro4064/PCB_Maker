@@ -11,6 +11,15 @@ Servo zServo;
 Adafruit_StepperMotor *xMotor = AFMS.getStepper(200, 2);// to motor port #2 (M3 and M4)
 Adafruit_StepperMotor *yMotor = AFMS.getStepper(200, 1);// I think port #1 (M1 and M2)
 
+
+
+//////////////////////////Ideas//////////////////////////
+
+/*
+ •Perhaps a delay will be needed after the write command for the servo
+ •maybe use MICROSTEP rather than SINGLE (https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors)
+*/
+
 //////////////////////////Variables //////////////////////////
 
 
@@ -27,6 +36,8 @@ float lastY_coordinate = 0.000;
 
 int LED = 13;
 bool next  = false;
+
+
 
 
 //////////////////////////Math functions//////////////////////////
@@ -70,7 +81,7 @@ void Z(String serialString){
   // return "next";
 }
 
-float XY(String serialString){
+void XY(String serialString){
 
   int stringLength = serialString.length();
   //  Serial.print("The string size is");
@@ -111,7 +122,9 @@ float XY(String serialString){
   Serial.print(yCoordinateFloat);
   Serial.println();
 
-  return xCoordinateFloat,yCoordinateFloat;
+  // return xCoordinateFloat,xCoordinateFloat;
+  xCoordinate_Float = xCoordinateFloat;
+  yCoordinate_Float = yCoordinateFloat;
 }
 
 void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coordinate, float last_Y_coordinate){
@@ -119,6 +132,11 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
   // Gets the difference between the current position and the desired one
   float toCoordinateX = xCoordinateFloat - last_X_coordinate;
   float toCoordinateY = yCoordinateFloat - last_Y_coordinate;
+
+  Serial.print("The toCoordinateX is: ");
+  Serial.println(toCoordinateX);
+  Serial.print("The toCoordinateY is: ");
+  Serial.println(toCoordinateY);
 
   // The modulus of the toCoordinate numbers, so we can move the steppers the right way
   float modulo_of_X,modulo_of_Y = Modulo(toCoordinateX,toCoordinateY);

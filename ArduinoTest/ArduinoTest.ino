@@ -6,7 +6,7 @@ void setup(){
   Serial.begin(9600);
   Serial.println("  _|_|_|                _|_|_|                  _|            \n_|                    _|          _|_|      _|_|_|    _|_|    \n_|  _|_|  _|_|_|_|_|  _|        _|    _|  _|    _|  _|_|_|_|  \n_|    _|              _|        _|    _|  _|    _|  _|        \n _|_|_|                _|_|_|    _|_|      _|_|_|    _|_|_| ");
 
-  zServo.attach(20);//Attaches the servo ro pin 20 on the arduino Mega and move it to position 0
+  zServo.attach(53);//Attaches the servo ro pin 20 on the arduino Mega and move it to position 0
   zServo.write(0);
 
   xMotor->setSpeed(10); //10 rpm, we need to test and see if it is enough
@@ -40,7 +40,7 @@ void loop() {
     else if (serialString[0] == 'X'){
 
         //Parses the serial communication and returns the x and y coordinates
-        xCoordinate_Float,yCoordinate_Float = XY(serialString);
+        XY(serialString);
 
         //Uses the coordinates to move the stepper motors
         MotorRun(xCoordinate_Float,yCoordinate_Float,lastX_coordinate,lastY_coordinate);
@@ -48,6 +48,9 @@ void loop() {
         //saves the coordinates as the last one for the next round
         lastX_coordinate = xCoordinate_Float;
         lastY_coordinate = yCoordinate_Float;
+
+        Serial.println(lastX_coordinate);
+        Serial.println(lastY_coordinate);
 
         // Sends a signal to the raspberry pi to tell it ot send the next line
         digitalWrite(LED,HIGH);
@@ -58,17 +61,17 @@ void loop() {
 
     }
 
-    while (next == false) {
-      /* code */
-      Serial.println('N');
+    // while (next == false) {
+    //   /* code */
+    //   Serial.println('N');
 
-      if (Serial.readString()[0] == 'o'){
-        next = true;
-        Serial.println("next = True");
-      }
+    //   if (Serial.readString()[0] == 'o'){
+    //     next = true;
+    //     Serial.println("next = True");
+    //   }
 
-    }
-    next = false;
+    // }
+    // next = false;
   }
 
 }
