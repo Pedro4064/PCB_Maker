@@ -4,25 +4,32 @@ String serialString;
 String status;
 
 //X,Y coordinates
-float xCoordinateFloat;
-float yCoordinateFloat;
+float xCoordinate_Float;
+float yCoordinate_Float;
 
 //Current coordinates
-float last_X_coordinate = 0.000;
-float last_Y_coordinate = 0.000;
+float lastX_coordinate = 0.000;
+float lastY_coordinate = 0.000;
 
 int LED = 13;
 bool next  = false;
 
 void setup(){
 
-Serial.begin(9600);
-Serial.println("  _|_|_|                _|_|_|                  _|            \n_|                    _|          _|_|      _|_|_|    _|_|    \n_|  _|_|  _|_|_|_|_|  _|        _|    _|  _|    _|  _|_|_|_|  \n_|    _|              _|        _|    _|  _|    _|  _|        \n _|_|_|                _|_|_|    _|_|      _|_|_|    _|_|_| ");
-pinMode(LED,OUTPUT);
+  Serial.begin(9600);
+  Serial.println("  _|_|_|                _|_|_|                  _|            \n_|                    _|          _|_|      _|_|_|    _|_|    \n_|  _|_|  _|_|_|_|_|  _|        _|    _|  _|    _|  _|_|_|_|  \n_|    _|              _|        _|    _|  _|    _|  _|        \n _|_|_|                _|_|_|    _|_|      _|_|_|    _|_|_| ");
+
+  zServo.attach(20);//Attaches the servo ro pin 20 on the arduino Mega and move it to position 0
+  zServo.write(0);
+
+  xMotor->setSpeed(10); //10 rpm, we need to test and see if it is enough
+  yMotor->setSpeed(10);
+
+  pinMode(LED,OUTPUT);
 
 }
 
-void loop(){
+void loop() {
 
   if(Serial.available()>0){
 
@@ -46,14 +53,14 @@ void loop(){
     else if (serialString[0] == 'X'){
 
         //Parses the serial communication and returns the x and y coordinates
-        xCoordinateFloat,yCoordinateFloat = XY(serialString);
+        xCoordinate_Float,yCoordinate_Float = XY(serialString);
 
         //Uses the coordinates to move the stepper motors
-        MotorRun(xCoordinateFloat,yCoordinateFloat,last_X_coordinate,last_Y_coordinate);
+        MotorRun(xCoordinate_Float,yCoordinate_Float,lastX_coordinate,lastY_coordinate);
 
         //saves the coordinates as the last one for the next round
-        last_X_coordinate = xCoordinateFloat;
-        last_Y_coordinate = yCoordinateFloat;
+        lastX_coordinate = xCoordinate_Float;
+        lastY_coordinate = yCoordinate_Float;
 
         // Sends a signal to the raspberry pi to tell it ot send the next line
         digitalWrite(LED,HIGH);
