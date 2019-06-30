@@ -1,4 +1,3 @@
-
 class Encoder {
 
   private:
@@ -81,8 +80,8 @@ void Z(String serialString){
 float XY(String serialString){
 
   int stringLength = serialString.length();
-//  Serial.print("The string size is");
-//  Serial.println(serialString.length());
+  //  Serial.print("The string size is");
+  //  Serial.println(serialString.length());
   int yPosition = 0;
 
   // The string versions of the Y and X coordinates
@@ -128,6 +127,11 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
   float toCoordinateX = xCoordinateFloat - last_X_coordinate;
   float toCoordinateY = yCoordinateFloat - last_Y_coordinate;
 
+  // The number of steps to move the whole sistem one milimiter -> have to check by building every thing, trial and error 
+  // Example --- for one milimiter the motor needs to do 200 steps, so the numberOfStepsX = 200
+  float numberOfStepsX = 0;
+  float numberOfStepsY = 0;
+
   // The code for the map function -> how many steps to move 1 millimiter etc
 
   // Chekcs to see if the desired coordinate is already the curret one. If so, move just the Y motor
@@ -167,14 +171,24 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
   else{
 
     // Checks to see which of the motors will have to run the longest
+    // The x is the longest, so move it with the Y until the Y arrives a location, then continue alone
     if (toCoordinateX > toCoordinateY){
-      // do something
-    
+      // Calculate the number of steps based on the numberOfStepsX and numberOfStepsY
+      numberOfStepsX = numberOfStepsX*toCoordinateX;
+      numberOfStepsY = numberOfStepsY*toCoordinateY;
+
+      for (float i = 0; i = numberOfStepsY; i++){
+        //Move both motors until the yMotor gets to the position, then only move the X motor
+      }
+      // move the x motor the numberOfStepsX -= numberOfStepsY
+      
+      
     }
     else if (toCoordinateX < toCoordinateY){
       // do something
     }
     else if (toCoordinateX == toCoordinateY){
+      // do something
 
     }
 
@@ -184,3 +198,4 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
 
 }
+

@@ -1,6 +1,5 @@
 #include "header.h"
 
-// Encoder knob(1,2,3);
 String serialString;
 String status;
 
@@ -13,6 +12,7 @@ float last_X_coordinate = 0.000;
 float last_Y_coordinate = 0.000;
 
 int LED = 13;
+bool next  = false;
 
 void setup(){
 
@@ -24,7 +24,6 @@ pinMode(LED,OUTPUT);
 
 void loop(){
 
-  // knob.check();
   if(Serial.available()>0){
 
     serialString = Serial.readString();
@@ -32,6 +31,7 @@ void loop(){
 
     if (serialString[0] == 'Z'){
 
+        //Remove 1 character from the string Starting at index 0 -> Remove the Z char from the string
         serialString.remove(0,1);
         Z(serialString);
 
@@ -64,6 +64,17 @@ void loop(){
 
     }
 
+    while (next == false) {
+      /* code */
+      Serial.println('N');
+
+      if (Serial.readString()[0] == 'o'){
+        next = true;
+        Serial.println("next = True");
+      }
+
+    }
+    next = false;
   }
 
 }
