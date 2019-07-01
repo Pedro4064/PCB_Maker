@@ -10,8 +10,8 @@ void setup(){
   zServo.write(0);
 
   AFMS.begin();  // create with the default frequency 1.6KHz
-  xMotor->setSpeed(10); //10 rpm, we need to test and see if it is enough
-  yMotor->setSpeed(10);
+  xMotor->setSpeed(20); //10 rpm, we need to test and see if it is enough
+  yMotor->setSpeed(20);
 
   
 
@@ -64,17 +64,17 @@ void loop() {
 
     }
 
-    // while (next == false) {
-    //   /* code */
-    //   Serial.println('N');
+     while (next == false) {
+       /* code */
+       Serial.println('N');
 
-    //   if (Serial.readString()[0] == 'o'){
-    //     next = true;
-    //     Serial.println("next = True");
-    //   }
+       if (Serial.readString()[0] == 'o'){
+         next = true;
+         Serial.println("next = True");
+       }
 
-    // }
-    // next = false;
+     }
+     next = false;
   }
 
 }

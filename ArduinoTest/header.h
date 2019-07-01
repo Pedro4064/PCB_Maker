@@ -8,7 +8,7 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Creates all the motors' objects + servo 
 Servo zServo;
-Adafruit_StepperMotor *xMotor = AFMS.getStepper(513, 2);// to motor port #2 (M3 and M4)
+Adafruit_StepperMotor *xMotor = AFMS.getStepper(2038, 2);// to motor port #2 (M3 and M4)
 Adafruit_StepperMotor *yMotor = AFMS.getStepper(513, 1);// I think port #1 (M1 and M2)
 
 
@@ -85,6 +85,7 @@ void Z(String serialString){
   }
 
   // return "next";
+
 }
 
 void XY(String serialString){
@@ -149,8 +150,8 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
   // The number of steps to move the whole sistem one milimiter -> have to check by building every thing, trial and error 
   // Example --- for one milimiter the motor needs to do 200 steps, so the numberOfStepsX = 200
-  float numberOfStepsX = 10;
-  float numberOfStepsY = 10;
+  float numberOfStepsX = 400;
+  float numberOfStepsY = 400;
   
 
   // Calculate the number of steps based on the numberOfStepsX and numberOfStepsY
@@ -307,7 +308,7 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
           //Move both motors until the yMotor gets to the position, then only move the X motor
           xMotor->step(steps,FORWARD,SINGLE);
           yMotor->step(steps,FORWARD,SINGLE);
-          Serial.println(i);
+          // Serial.println(i);
           
         }
           

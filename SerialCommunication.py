@@ -36,7 +36,7 @@ with open("gCodeOutput.txt",'r') as gCode:
         # Need to chakc how long it takes from one corner to the next (or use the gpios of the π to receive a HIGH to continue )
         while next == False:
 
-            print('.')
+            # print('.')
             try:
                 if ser.read().decode('ascii') == 'N':
                     next = True
