@@ -9,8 +9,11 @@ void setup(){
   zServo.attach(53);//Attaches the servo ro pin 20 on the arduino Mega and move it to position 0
   zServo.write(0);
 
+  AFMS.begin();  // create with the default frequency 1.6KHz
   xMotor->setSpeed(10); //10 rpm, we need to test and see if it is enough
   yMotor->setSpeed(10);
+
+  
 
   pinMode(LED,OUTPUT);
 

@@ -8,8 +8,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Creates all the motors' objects + servo 
 Servo zServo;
-Adafruit_StepperMotor *xMotor = AFMS.getStepper(200, 2);// to motor port #2 (M3 and M4)
-Adafruit_StepperMotor *yMotor = AFMS.getStepper(200, 1);// I think port #1 (M1 and M2)
+Adafruit_StepperMotor *xMotor = AFMS.getStepper(513, 2);// to motor port #2 (M3 and M4)
+Adafruit_StepperMotor *yMotor = AFMS.getStepper(513, 1);// I think port #1 (M1 and M2)
 
 
 
@@ -41,8 +41,8 @@ float lastY_coordinate = 0.000;
 int LED = 13;
 bool next  = false;
 
-
-
+// For the FOR loop, command the steppers to do one step each for loop iteration
+int steps = 1;
 
 //////////////////////////Math functions//////////////////////////
 
@@ -149,12 +149,20 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
   // The number of steps to move the whole sistem one milimiter -> have to check by building every thing, trial and error 
   // Example --- for one milimiter the motor needs to do 200 steps, so the numberOfStepsX = 200
-  float numberOfStepsX,numberOfStepsY = 0;
+  float numberOfStepsX = 10;
+  float numberOfStepsY = 10;
   
 
   // Calculate the number of steps based on the numberOfStepsX and numberOfStepsY
   numberOfStepsX = numberOfStepsX*modulo_of_X;
   numberOfStepsY = numberOfStepsY*modulo_of_Y;
+
+  Serial.print("The number of steps x is ");
+  Serial.println(numberOfStepsX);
+  
+  Serial.print("The number of steps y is ");
+  Serial.println(numberOfStepsY);
+
 
   // Chekcs to see if the desired coordinate is already the curret one. If so, move just the Y motor
   if (toCoordinateX == 0 ){
@@ -163,13 +171,19 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
     //Move Y motor to position
 
     if (toCoordinateY < 0){
+
       //move counter clockwise to position
-      Serial.println("Move the y motor counter clockwise to position");
+      Serial.println("Move the y motor counter clockwise to position");      
+      yMotor->step(numberOfStepsY,BACKWARD);      
+      
     }
 
     else{
+
       //move clockwise to position
-      Serial.println("Move the Y motor clockwise to position");
+      Serial.println("Move the Y motor clockwise to position");      
+      yMotor->step(numberOfStepsY,FORWARD);      
+      
     }
 
   }
@@ -180,15 +194,23 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
     //Move X Motor
 
     if(toCoordinateX<0){
-      Serial.println("Move the X motor counter clockwise to position");
 
-    }
+      Serial.println("Move the X motor counter clockwise to position");  
+      xMotor->step(numberOfStepsX,BACKWARD);
+    }  
+    
 
     else{
-      Serial.println("Move motor clock wise to position");
+
+      Serial.println("Move motor clock wise to position"); 
+      xMotor->step(numberOfStepsX,FORWARD);
+      
     }
 
   }
+
+
+
 
   // If both are different, move both simultaneously
   else{
@@ -200,10 +222,11 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
     
       // Checks to see if both are positive values, if so, move both clockwise.
       if (toCoordinateX>0 && toCoordinateY>0){
-          for (float i = 0; i = numberOfStepsY; i++){
+          for (float i = 0; i < numberOfStepsY; i++){
             //Move both motors until the yMotor gets to the position, then only move the X motor
-            xMotor->step(i,FORWARD,SINGLE);
-            yMotor->step(i,FORWARD,SINGLE);
+            xMotor->step(steps,FORWARD,SINGLE);
+            yMotor->step(steps,FORWARD,SINGLE);
+            // Serial.println(i);
           }
           // move the x motor the numberOfStepsX -= numberOfStepsY -> move the x motor the rest of the steps
           xMotor->step(numberOfStepsX - numberOfStepsY,FORWARD,SINGLE);
@@ -211,10 +234,10 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
       // Checks to see if both are negative values, if so, move both counter clockwise.
       else if (toCoordinateX<0 && toCoordinateY<0){
-        for (float i = 0; i = numberOfStepsY; i++)
+        for (float i = 0; i < numberOfStepsY; i++)
         {
-          xMotor->step(i,BACKWARD,SINGLE);
-          yMotor->step(i,BACKWARD,SINGLE);
+          xMotor->step(steps,BACKWARD,SINGLE);
+          yMotor->step(steps,BACKWARD,SINGLE);
         }
           // Move the x motor the rest of the necessary steps
           xMotor->step(numberOfStepsX - numberOfStepsY,BACKWARD,SINGLE);
@@ -223,9 +246,9 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
       // Move the x clockwise and the y counter clockwise
       else if (toCoordinateX>0 && toCoordinateY<0){
-        for (float i = 0; i = numberOfStepsY; i++){
-          xMotor->step(i,FORWARD,SINGLE);
-          yMotor->step(i,BACKWARD,SINGLE);
+        for (float i = 0; i < numberOfStepsY; i++){
+          xMotor->step(steps,FORWARD,SINGLE);
+          yMotor->step(steps,BACKWARD,SINGLE);
         }
         xMotor->step(numberOfStepsX-numberOfStepsY,FORWARD,SINGLE);
         
@@ -234,10 +257,10 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
       // move the x counter clockwise and the y clockwise
       else if (toCoordinateX<0 && toCoordinateY>0){
-        for (float i = 0; i = numberOfStepsY; i++)
+        for (float i = 0; i < numberOfStepsY; i++)
         {
-          xMotor->step(i,BACKWARD,SINGLE);
-          yMotor->step(i,FORWARD,SINGLE);
+          xMotor->step(steps,BACKWARD,SINGLE);
+          yMotor->step(steps,FORWARD,SINGLE);
         }
         xMotor->step(numberOfStepsX-numberOfStepsY,BACKWARD,SINGLE);
         
@@ -251,10 +274,10 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
       
       // Checks to see if both are positive values, if so, move both clockwise.
       if (toCoordinateX>0 && toCoordinateY>0){
-          for (float i = 0; i = numberOfStepsX; i++){
+          for (float i = 0; i < numberOfStepsX; i++){
             //Move both motors until the yMotor gets to the position, then only move the X motor
-            xMotor->step(i,FORWARD,SINGLE);
-            yMotor->step(i,FORWARD,SINGLE);
+            xMotor->step(steps,FORWARD,SINGLE);
+            yMotor->step(steps,FORWARD,SINGLE);
           }
           // move the x motor the numberOfStepsX -= numberOfStepsY -> move the x motor the rest of the steps
           yMotor->step(numberOfStepsY - numberOfStepsX,FORWARD,SINGLE);
@@ -262,10 +285,10 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
       // Checks to see if both are negative values, if so, move both counter clockwise.
       else if (toCoordinateX<0 && toCoordinateY<0){
-        for (float i = 0; i = modulo_of_Y; i++)
+        for (float i = 0; i < modulo_of_Y; i++)
         {
-          xMotor->step(i,BACKWARD,SINGLE);
-          yMotor->step(i,BACKWARD,SINGLE);
+          xMotor->step(steps,BACKWARD,SINGLE);
+          yMotor->step(steps,BACKWARD,SINGLE);
         }
           // Move the x motor the rest of the necessary steps
           yMotor->step(numberOfStepsY - numberOfStepsX,BACKWARD,SINGLE);
@@ -280,28 +303,30 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
       
      // Checks to see if both are positive values, if so, move both clockwise, but the same amount of steps1
      if (toCoordinateX>0 && toCoordinateY>0){
-        for (float i = 0; i = numberOfStepsY; i++){
+        for (float i = 0; i < numberOfStepsY; i++){
           //Move both motors until the yMotor gets to the position, then only move the X motor
-          xMotor->step(i,FORWARD,SINGLE);
-          yMotor->step(i,FORWARD,SINGLE);
+          xMotor->step(steps,FORWARD,SINGLE);
+          yMotor->step(steps,FORWARD,SINGLE);
+          Serial.println(i);
+          
         }
           
      }
 
       // Checks to see if both are negative values, if so, move both counter clockwise, but the same amount of steps
      else if (toCoordinateX<0 && toCoordinateY<0){
-        for (float i = 0; i = numberOfStepsY; i++){
-          xMotor->step(i,BACKWARD,SINGLE);
-          yMotor->step(i,BACKWARD,SINGLE);
+        for (float i = 0; i < numberOfStepsY; i++){
+          xMotor->step(steps,BACKWARD,SINGLE);
+          yMotor->step(steps,BACKWARD,SINGLE);
         }
         
      }
 
       // Move the x clockwise and the y counter clockwise, but the same amount of steps 
      else if (toCoordinateX>0 && toCoordinateY<0){
-        for (float i = 0; i = numberOfStepsY; i++){
-          xMotor->step(i,FORWARD,SINGLE);
-          yMotor->step(i,BACKWARD,SINGLE);
+        for (float i = 0; i < numberOfStepsY; i++){
+          xMotor->step(steps,FORWARD,SINGLE);
+          yMotor->step(steps,BACKWARD,SINGLE);
         }
         
 
@@ -309,10 +334,10 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
 
       // move the x counter clockwise and the y clockwise, but the same amount of steps
      else if (toCoordinateX<0 && toCoordinateY>0){
-        for (float i = 0; i = numberOfStepsY; i++)
+        for (float i = 0; i < numberOfStepsY; i++)
         {
-          xMotor->step(i,BACKWARD,SINGLE);
-          yMotor->step(i,FORWARD,SINGLE);
+          xMotor->step(steps,BACKWARD,SINGLE);
+          yMotor->step(steps,FORWARD,SINGLE);
         }
         
 
