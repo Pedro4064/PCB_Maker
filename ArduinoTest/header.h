@@ -18,6 +18,7 @@ Adafruit_StepperMotor *yMotor = AFMS.getStepper(200, 1);// I think port #1 (M1 a
 /*
  •Perhaps a delay will be needed after the write command for the servo
  •maybe use MICROSTEP rather than SINGLE (https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors)
+ •Change the steps to 513, wire it orange,pink,red,blue,yellow
 */
 
 //////////////////////////Variables //////////////////////////
@@ -29,6 +30,9 @@ String status;
 //X,Y coordinates
 float xCoordinate_Float;
 float yCoordinate_Float;
+
+//The modulus of the toCoordinate numbers
+float modulo_of_Y , modulo_of_X;
 
 //Current coordinates
 float lastX_coordinate = 0.000;
@@ -58,7 +62,9 @@ float Modulo(float a, float b){
     b=b*-1;
   }
 
-  return a,b;
+  // return a,b;
+  modulo_of_X = a;
+  modulo_of_Y = b;
 }
 
 //////////////////////////Plotting Functions//////////////////////////
@@ -139,7 +145,7 @@ void MotorRun(float xCoordinateFloat, float yCoordinateFloat, float last_X_coord
   Serial.println(toCoordinateY);
 
   // The modulus of the toCoordinate numbers, so we can move the steppers the right way
-  float modulo_of_X,modulo_of_Y = Modulo(toCoordinateX,toCoordinateY);
+  Modulo(toCoordinateX,toCoordinateY);
 
   // The number of steps to move the whole sistem one milimiter -> have to check by building every thing, trial and error 
   // Example --- for one milimiter the motor needs to do 200 steps, so the numberOfStepsX = 200

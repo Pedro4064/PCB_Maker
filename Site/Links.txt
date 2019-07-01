@@ -1,3 +1,8 @@
 https://carbide3d.com/apps/pcb/
 
 // Viwer -> https://ncviewer.com/
+
+
+
+//Stepper motor
+https://www.adafruit.com/product/858
