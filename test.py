@@ -187,13 +187,15 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             #Defining variables for text formatting
             lineCount = 0
 
+            # Get the name of the file to be formatted, get rid of the path and add "output" to the name of the new file
             name = self.gCodeFile.split('/')
-            print(name[len(name)-1])
+            name = "output_"+name[len(name)-1]
+
             # Creates the new gCode Output file (.txt)
-            with open("gCodeOutput.txt","w") as newGcode:
+            with open(name,"w") as newGcode:
 
                 # Opens the original gCode (unformatted)
-                with open(fileName,'r') as gCode:
+                with open(self.gCodeFile,'r') as gCode:
 
                     #Devides the line by white spaces into a list
                     for line in gCode:
