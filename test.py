@@ -154,7 +154,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
             plot = True
 
-            # Open the gCode file
+            # Open the gCode file and plot it 
             with open(self.lastFile,"r") as gcode:
 
                 # Read line by line
@@ -191,6 +191,20 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
                 # Show the picture
                 plt.show()
+
+                # Send via Serial 
+                buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+            if buttonReply == QMessageBox.Yes:
+
+                print('Uploading via serial ')
+                try:
+                    self.SendSerial(self.lastFile)
+                    
+                except:            
+                    self.label.setText("error")
+                    self.setGeometry(self.left, self.top, self.width, self.height)
+
         except:
             print("Fuck")
 
@@ -273,7 +287,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             self.serialPort = device
 
     def SendSerial(self,file):
-        print("oi")
+        print(file)
 
         # if no port is defined, go to the setSerialPort and then continue
         if self.serialPort == " ":
@@ -330,6 +344,8 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             for line in file:
                 count+=1
         return count
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
