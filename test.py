@@ -30,7 +30,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
         FormatBtn = QPushButton("Format gCode",self)
         FormatBtn.move(0,0)
-        FormatBtn.resize(1280,100)
+        FormatBtn.resize(1270,100)
 
 
         chooseFileBtn = QPushButton('Upload file', self)
@@ -45,6 +45,36 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         portBtn = QPushButton('Set serial port for the arduino',self)
         portBtn.move(0,300)
         portBtn.resize(1280,100)
+
+        # Set the stle for the buttons
+        style = """
+        QPushButton {
+            border: 1px solid white;
+            border-radius: 10px;
+            color: white;
+            
+            
+            }
+        QPushButton:hover{
+            color : black;
+            background-color: rgba(155,186,124,230);
+            
+        }
+        """
+        portBtn.setStyleSheet(style)
+        lastFileBtn.setStyleSheet(style)
+        chooseFileBtn.setStyleSheet(style)
+        FormatBtn.setStyleSheet(style)
+
+        self.setStyleSheet("""
+        QMainWindow {
+            
+            
+            background-color: rgba(41,44,50,230);
+            
+            }
+        """)
+
 
         # sendSerialBtn = QPushButton('Send serial data to the arduino',self)
         # sendSerialBtn.move(0,400)
