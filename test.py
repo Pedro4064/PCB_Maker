@@ -54,7 +54,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.ProgressBar.setGeometry(400, 400, 400, 400)
         self.ProgressBar.move(450,400)
 
-        self.label  =QLabel(self)
+        self.label  = QLabel(self)
         self.label.move(625,600)
         self.label.setText("Progress Bar")
 
@@ -84,8 +84,12 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
             if buttonReply == QMessageBox.Yes:
                 print('Uploading via serial ')
-                self.SendSerial(self.fileName)
-
+                try:
+                    self.SendSerial(self.fileName)
+                except:
+                    self.label.setText("error")
+                    self.setGeometry(self.left, self.top, self.width, self.height)
+                    
             else:
                 print('No clicked.')
 
@@ -275,10 +279,50 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         if self.serialPort == " ":
             self.setSerialPort()
 
+        self.ProgressBar.setRange(0,self.getNumberOfLines(file))
 
         print("Sending serial info")
-        print(file)
+        # print(file)
+        # print(self.getNumberOfLines(file))
 
+        # Configures the serial port and bRate
+        ser = serial.Serial(self.serialPort,baudrate = 9600)
+
+        #Opens the gCode file
+        with open(file,'r') as gCode:
+
+
+            print('Starting to send gcode...')
+
+            #Goes line by line
+            for line in gCode:
+
+                time.sleep(5) #Perhaps we wont need this delay since the arduino will take his time to move the motors...
+                next = False
+
+                print(line.strip('\n'))
+
+                #Send to the arduino the line
+                ser.write(line.strip('\n').encode())
+
+                # Need to chakc how long it takes from one corner to the next (or use the gpios of the π to receive a HIGH to continue )
+                while next == False:
+
+                    # print('.')
+                    try:
+                        if ser.read().decode('ascii') == 'N':
+                            next = True
+                            print('sending next command')
+                            ser.write(b'ok')
+
+                            break
+                    except:
+                        continue
+
+
+
+
+        ser.close()
 
     def getNumberOfLines(self,name):
         count = 0
