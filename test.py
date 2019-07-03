@@ -28,27 +28,34 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.label  = QLabel(self)
-        self.label.move(625,600)
+        self.label.move(625,650)
         self.label.setText("Progress Bar")
 
+        # Set the buttons dimensions
+        self.buttonWidht = 1280
+        self.buttonHight = 100
 
         FormatBtn = QPushButton("Format gCode",self)
         FormatBtn.move(0,0)
-        FormatBtn.resize(1270,100)
+        FormatBtn.resize(self.buttonWidht,self.buttonHight)
 
 
         chooseFileBtn = QPushButton('Upload file', self)
         chooseFileBtn.move(0,100)
-        chooseFileBtn.resize(1280,100)
+        chooseFileBtn.resize(self.buttonWidht,self.buttonHight)
 
 
         lastFileBtn = QPushButton('Upload Last file',self)
         lastFileBtn.move(0,200)
-        lastFileBtn.resize(1280,100)
+        lastFileBtn.resize(self.buttonWidht,self.buttonHight)
 
         portBtn = QPushButton('Set serial port for the arduino',self)
         portBtn.move(0,300)
-        portBtn.resize(1280,100)
+        portBtn.resize(self.buttonWidht,self.buttonHight)
+
+        showGcodeBtn = QPushButton('Plot gCode for preview',self)
+        showGcodeBtn.move(0,400)
+        showGcodeBtn.resize(self.buttonWidht,self.buttonHight)
 
         # Set the stle for the buttons
         style = """
@@ -69,9 +76,10 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         lastFileBtn.setStyleSheet(style)
         chooseFileBtn.setStyleSheet(style)
         FormatBtn.setStyleSheet(style)
+        showGcodeBtn.setStyleSheet(style)
 
         self.setStyleSheet("""
-        QMainWindow {
+         QMainWindow {
             
             
             background-color: rgba(41,44,50,230);
@@ -93,8 +101,8 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         # sendSerialBtn.resize(1280,100)
 
         self.ProgressBar = QProgressBar(self)
-        self.ProgressBar.setGeometry(400, 400, 400, 400)
-        self.ProgressBar.move(450,400)
+        self.ProgressBar.setGeometry(100, 100, 400, 400)
+        self.ProgressBar.move(450,500)
 
         
 
@@ -104,7 +112,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         lastFileBtn.clicked.connect(self.PlotLast)
         FormatBtn.clicked.connect(self.FormatGcode)
         portBtn.clicked.connect(self.setSerialPort)
-
+        showGcodeBtn.clicked.connect(self.ButtonPlot)
 
         self.show()
 
@@ -116,27 +124,25 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.fileName, ok = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Text Files (*.txt)", options=options)
 
 
-        if ok == True:
 
-                # Update the lastFile path, so the user can press the lastFileBtn and open the las used file
-                self.lastFile = self.fileName
-                print(self.fileName)
-                self.Plot()
 
-                buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        # Update the lastFile path, so the user can press the lastFileBtn and open the las used file
+        self.lastFile = self.fileName
+        print("The file name is",self.fileName)
+        self.Plot()
 
-                if buttonReply == QMessageBox.Yes:
-                    print('Uploading via serial ')
-                    try:
-                        self.SendSerial(self.fileName)
-                    except:
-                        self.label.setText("error")
-                        self.setGeometry(self.left, self.top, self.width, self.height)
-                        
-                else:
-                    print('No clicked.')
-        else:
-            print('ok')
+        buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if buttonReply == QMessageBox.Yes:
+            print('Uploading via serial ')
+            try:
+                self.SendSerial(self.fileName)
+            except:
+                self.label.setText("error")
+                self.setGeometry(self.left, self.top, self.width, self.height)
+                    
+            else:
+                print('No clicked.')
 
     def Plot(self):
         try:
@@ -394,6 +400,18 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
                 count+=1
         return count
 
+    def ButtonPlot(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        self.fileName, ok = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Text Files (*.txt)", options=options)
+
+
+
+
+        # Update the lastFile path, so the user can press the lastFileBtn and open the las used file
+        self.lastFile = self.fileName
+        print("The file name is",self.fileName)
+        self.Plot()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
