@@ -27,6 +27,10 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
+        self.label  = QLabel(self)
+        self.label.move(625,600)
+        self.label.setText("Progress Bar")
+
 
         FormatBtn = QPushButton("Format gCode",self)
         FormatBtn.move(0,0)
@@ -57,7 +61,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             }
         QPushButton:hover{
             color : black;
-            background-color: rgba(155,186,124,230);
+            background-color: rgba(236,141,52,230);
             
         }
         """
@@ -75,6 +79,14 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             }
         """)
 
+        self.label.setStyleSheet(
+            """
+            QLabel {
+                color:white;
+            }
+            """
+        )
+
 
         # sendSerialBtn = QPushButton('Send serial data to the arduino',self)
         # sendSerialBtn.move(0,400)
@@ -84,11 +96,10 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.ProgressBar.setGeometry(400, 400, 400, 400)
         self.ProgressBar.move(450,400)
 
-        self.label  = QLabel(self)
-        self.label.move(625,600)
-        self.label.setText("Progress Bar")
+        
 
 
+        
         chooseFileBtn.clicked.connect(self.openFileNameDialog)
         lastFileBtn.clicked.connect(self.PlotLast)
         FormatBtn.clicked.connect(self.FormatGcode)
@@ -98,30 +109,34 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         self.show()
 
     def openFileNameDialog(self):
+        
+
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         self.fileName, ok = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Text Files (*.txt)", options=options)
 
 
-        if self.fileName:
+        if ok == True:
 
-            # Update the lastFile path, so the user can press the lastFileBtn and open the las used file
-            self.lastFile = self.fileName
-            print(self.fileName)
-            self.Plot()
+                # Update the lastFile path, so the user can press the lastFileBtn and open the las used file
+                self.lastFile = self.fileName
+                print(self.fileName)
+                self.Plot()
 
-            buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
-            if buttonReply == QMessageBox.Yes:
-                print('Uploading via serial ')
-                try:
-                    self.SendSerial(self.fileName)
-                except:
-                    self.label.setText("error")
-                    self.setGeometry(self.left, self.top, self.width, self.height)
-                    
-            else:
-                print('No clicked.')
+                if buttonReply == QMessageBox.Yes:
+                    print('Uploading via serial ')
+                    try:
+                        self.SendSerial(self.fileName)
+                    except:
+                        self.label.setText("error")
+                        self.setGeometry(self.left, self.top, self.width, self.height)
+                        
+                else:
+                    print('No clicked.')
+        else:
+            print('ok')
 
     def Plot(self):
         try:
@@ -245,68 +260,72 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         options |= QFileDialog.DontUseNativeDialog
         self.gCodeFile, ok = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Text Files (*.txt)", options=options)
 
-        # Creates the QProgressBar
+        try:
 
-        self.ProgressBar.setRange(0,self.getNumberOfLines(self.gCodeFile))
-        self.label.setText("formatting file ...")
+            # Creates the QProgressBar
 
-
-
-        if self.gCodeFile:
-
-            buttonReply = QMessageBox.question(self, 'gCode formatting', "Sure you want to format this gcode?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-
-            if buttonReply == QMessageBox.Yes:
-                print('Yes clicked.')
-
-            #############################format the gcode#######################
-            #Defining variables for text formatting
-            lineCount = 0
-
-            # Get the name of the file to be formatted, get rid of the path and add "output" to the name of the new file
-            name = self.gCodeFile.split('/')
-            name = "output_"+name[len(name)-1]
-
-            # Creates the new gCode Output file (.txt)
-            with open(name,"w") as newGcode:
-
-                # Opens the original gCode (unformatted)
-                with open(self.gCodeFile,'r') as gCode:
-
-                    # Get the number of the line it is in
-                    count = 0
-
-                    #Devides the line by white spaces into a list
-                    for line in gCode:
-
-                        #update the ProgressBar
-                        count+=1
-                        self.ProgressBar.setValue(count)
+            self.ProgressBar.setRange(0,self.getNumberOfLines(self.gCodeFile))
+            self.label.setText("formatting file ...")
 
 
-                        if "(" in line:
-                            continue
-                        line = line.split(" ")
 
-                        #goes through each  section of the line
-                        for section in line:
+            if self.gCodeFile:
 
-                            #If it has z,y or z it writes it to the new file
-                            if "X" in section or "Z" in section or "Y" in section:
+                buttonReply = QMessageBox.question(self, 'gCode formatting', "Sure you want to format this gcode?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
-                                #Formats the new file by adding space between z/x/y info
-                                if lineCount>0:
-                                    newGcode.write(section.replace("Y"," Y"))
-                                else:
-                                    newGcode.write(section)
+                if buttonReply == QMessageBox.Yes:
+                    print('Yes clicked.')
 
-                                lineCount+=1
+                #############################format the gcode#######################
+                #Defining variables for text formatting
+                lineCount = 0
 
-                            else:
+                # Get the name of the file to be formatted, get rid of the path and add "output" to the name of the new file
+                name = self.gCodeFile.split('/')
+                name = "output_"+name[len(name)-1]
+
+                # Creates the new gCode Output file (.txt)
+                with open(name,"w") as newGcode:
+
+                    # Opens the original gCode (unformatted)
+                    with open(self.gCodeFile,'r') as gCode:
+
+                        # Get the number of the line it is in
+                        count = 0
+
+                        #Devides the line by white spaces into a list
+                        for line in gCode:
+
+                            #update the ProgressBar
+                            count+=1
+                            self.ProgressBar.setValue(count)
+
+
+                            if "(" in line:
                                 continue
+                            line = line.split(" ")
 
-                self.label.setText("Done")
-                self.setGeometry(self.left, self.top, self.width, self.height)
+                            #goes through each  section of the line
+                            for section in line:
+
+                                #If it has z,y or z it writes it to the new file
+                                if "X" in section or "Z" in section or "Y" in section:
+
+                                    #Formats the new file by adding space between z/x/y info
+                                    if lineCount>0:
+                                        newGcode.write(section.replace("Y"," Y"))
+                                    else:
+                                        newGcode.write(section)
+
+                                    lineCount+=1
+
+                                else:
+                                    continue
+
+                    self.label.setText("Done")
+                    self.setGeometry(self.left, self.top, self.width, self.height)
+        except:
+            print("Oh Well")
 
     def setSerialPort(self):
 
