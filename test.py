@@ -1,21 +1,25 @@
-import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QPushButton, QToolBar, QTableWidget,QTableWidgetItem, QInputDialog, QLineEdit, QFileDialog,QLabel,QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QPushButton, QToolBar, QTableWidget,QTableWidgetItem, QInputDialog, QLineEdit, QFileDialog,QLabel,QMessageBox,QProgressBar
 from PyQt5.QtGui import QIcon, QPixmap, QImage
 import matplotlib.pyplot as plt
+import serial
+import time
+import sys
 
 
-class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetItem, QLabel, QPixmap, QImage,QFileDialog,QMessageBox):
+class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetItem, QLabel, QPixmap, QImage,QFileDialog,QMessageBox,QProgressBar):
 
     def __init__(self):
         super().__init__()
         self.title = 'gCode Plotter'
-        self.left = 10
-        self.top = 10
+        self.left = 0
+        self.top = 0
         self.width = 1280
         self.height = 960
 
         self.fileName = " "
         self.lastFile = " "
+
+        self.serialPort = " "
 
         self.initUI()
 
@@ -26,26 +30,42 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
         FormatBtn = QPushButton("Format gCode",self)
         FormatBtn.move(0,0)
-        FormatBtn.resize(200,100)
+        FormatBtn.resize(1280,100)
 
 
         chooseFileBtn = QPushButton('Upload file', self)
         chooseFileBtn.move(0,100)
-        chooseFileBtn.resize(200,100)
+        chooseFileBtn.resize(1280,100)
 
 
         lastFileBtn = QPushButton('Upload Last file',self)
         lastFileBtn.move(0,200)
-        lastFileBtn.resize(200,100)
+        lastFileBtn.resize(1280,100)
+
+        portBtn = QPushButton('Set serial port for the arduino',self)
+        portBtn.move(0,300)
+        portBtn.resize(1280,100)
+
+        # sendSerialBtn = QPushButton('Send serial data to the arduino',self)
+        # sendSerialBtn.move(0,400)
+        # sendSerialBtn.resize(1280,100)
+
+        self.ProgressBar = QProgressBar(self)
+        self.ProgressBar.setGeometry(400, 400, 400, 400)
+        self.ProgressBar.move(450,400)
+
+        self.label  =QLabel(self)
+        self.label.move(625,600)
+        self.label.setText("Progress Bar")
+
 
         chooseFileBtn.clicked.connect(self.openFileNameDialog)
         lastFileBtn.clicked.connect(self.PlotLast)
         FormatBtn.clicked.connect(self.FormatGcode)
+        portBtn.clicked.connect(self.setSerialPort)
 
 
         self.show()
-        # self.openFileNameDialog()
-
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -63,7 +83,9 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             buttonReply = QMessageBox.question(self, 'Start Serial Connection', "Sure you want to print this PCB?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
             if buttonReply == QMessageBox.Yes:
-                print('Yes clicked.')
+                print('Uploading via serial ')
+                self.SendSerial(self.fileName)
+
             else:
                 print('No clicked.')
 
@@ -175,6 +197,12 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
         options |= QFileDialog.DontUseNativeDialog
         self.gCodeFile, ok = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","Text Files (*.txt)", options=options)
 
+        # Creates the QProgressBar
+
+        self.ProgressBar.setRange(0,self.getNumberOfLines(self.gCodeFile))
+        self.label.setText("formatting file ...")
+
+
 
         if self.gCodeFile:
 
@@ -197,8 +225,17 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
                 # Opens the original gCode (unformatted)
                 with open(self.gCodeFile,'r') as gCode:
 
+                    # Get the number of the line it is in
+                    count = 0
+
                     #Devides the line by white spaces into a list
                     for line in gCode:
+
+                        #update the ProgressBar
+                        count+=1
+                        self.ProgressBar.setValue(count)
+
+
                         if "(" in line:
                             continue
                         line = line.split(" ")
@@ -220,7 +257,35 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
                             else:
                                 continue
 
+                self.label.setText("Done")
+                self.setGeometry(self.left, self.top, self.width, self.height)
 
+    def setSerialPort(self):
+
+        ports = ['/dev/tty.usbmodem14101','/dev/tty.usbmodem14201']
+        device, ok = QInputDialog.getItem(self, 'Device', 'Choose your device', ports,0,False)
+        if ok == True:
+            # print(device)
+            self.serialPort = device
+
+    def SendSerial(self,file):
+        print("oi")
+
+        # if no port is defined, go to the setSerialPort and then continue
+        if self.serialPort == " ":
+            self.setSerialPort()
+
+
+        print("Sending serial info")
+        print(file)
+
+
+    def getNumberOfLines(self,name):
+        count = 0
+        with open(name,'r') as file:
+            for line in file:
+                count+=1
+        return count
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
