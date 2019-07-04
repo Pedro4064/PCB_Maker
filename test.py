@@ -188,7 +188,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
 
                 # Plot all the coordinates and set the settings
-                # plt.figure(figsize = (10,5))
+                plt.figure(figsize = (10,7))
                 plt.plot(x,y)
                 plt.title("Pen Path")
                 plt.xlabel("mm")
