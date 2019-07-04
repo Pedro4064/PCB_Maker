@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QPushButton, QToolBar, QTableWidget,QTableWidgetItem, QInputDialog, QLineEdit, QFileDialog,QLabel,QMessageBox,QProgressBar
 from PyQt5.QtGui import QIcon, QPixmap, QImage
+from PyQt5.QtCore import *
 import matplotlib.pyplot as plt
 import serial
 import time
@@ -9,7 +10,9 @@ import sys
 class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetItem, QLabel, QPixmap, QImage,QFileDialog,QMessageBox,QProgressBar):
 
     def __init__(self):
-        super().__init__()
+        
+        super(App, self).__init__()
+        self.threadpool = QThreadPool()
         self.title = 'gCode Plotter'
         self.left = 0
         self.top = 0
@@ -137,12 +140,13 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             print('Uploading via serial ')
             try:
                 self.SendSerial(self.fileName)
+            
             except:
                 self.label.setText("error")
                 self.setGeometry(self.left, self.top, self.width, self.height)
-                    
-            else:
-                print('No clicked.')
+                        
+        else:
+            print('No clicked.')
 
     def Plot(self):
         try:
@@ -342,13 +346,25 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
             self.serialPort = device
 
     def SendSerial(self,file):
+
+
         print(file)
+
+        # count for the progress bar
+        count = 0
 
         # if no port is defined, go to the setSerialPort and then continue
         if self.serialPort == " ":
             self.setSerialPort()
 
+        # Set the progress bar
         self.ProgressBar.setRange(0,self.getNumberOfLines(file))
+
+        # Set the label name and update window
+        self.label.setText("Transferring via Serial")
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        
 
         print("Sending serial info")
         # print(file)
@@ -365,6 +381,11 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
             #Goes line by line
             for line in gCode:
+                QApplication.processEvents()
+
+                # update the progress
+                count+=1
+                self.ProgressBar.setValue(count)
 
                 time.sleep(5) #Perhaps we wont need this delay since the arduino will take his time to move the motors...
                 next = False
@@ -374,8 +395,9 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
                 #Send to the arduino the line
                 ser.write(line.strip('\n').encode())
 
-                # Need to chakc how long it takes from one corner to the next (or use the gpios of the π to receive a HIGH to continue )
+                # Need to check how long it takes from one corner to the next (or use the gpios of the π to receive a HIGH to continue )
                 while next == False:
+                    QApplication.processEvents()
 
                     # print('.')
                     try:
