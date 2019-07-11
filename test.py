@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import serial
 import time
 import sys
+import os
 
 
-class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetItem, QLabel, QPixmap, QImage,QFileDialog,QMessageBox,QProgressBar):
+class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetItem, QLabel, QPixmap, QImage,QFileDialog,QMessageBox,QProgressBar,QApplication):
 
     def __init__(self):
         
@@ -347,7 +348,7 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
     def SendSerial(self,file):
 
-
+        
         print(file)
 
         # count for the progress bar
@@ -379,27 +380,38 @@ class App(QMainWindow,QPushButton, QToolBar, QIcon, QTableWidget, QTableWidgetIt
 
             print('Starting to send gcode...')
 
+            time.sleep(5) #Perhaps we wont need this delay since the arduino will take his time to move the motors...
+
             #Goes line by line
             for line in gCode:
-                QApplication.processEvents()
 
                 # update the progress
                 count+=1
                 self.ProgressBar.setValue(count)
 
-                time.sleep(5) #Perhaps we wont need this delay since the arduino will take his time to move the motors...
+                time.sleep(3) #Perhaps we wont need this delay since the arduino will take his time to move the motors...
                 next = False
 
                 print(line.strip('\n'))
+                # display the coordinate being sent to the arduino on the label, than update the QApplication
+                self.label.setText(line.strip('\n'))
+                App.processEvents()
 
                 #Send to the arduino the line
                 ser.write(line.strip('\n').encode())
 
+                # set a counter to processEvents every 5 iteration
+                processCounter = 0
+
                 # Need to check how long it takes from one corner to the next (or use the gpios of the π to receive a HIGH to continue )
                 while next == False:
-                    QApplication.processEvents()
+                    processCounter+=1
 
-                    # print('.')
+                    # if processCounter%3 == 0 :
+                    App.processEvents()
+                    # time.sleep(1)
+
+                    
                     try:
                         if ser.read().decode('ascii') == 'N':
                             next = True
