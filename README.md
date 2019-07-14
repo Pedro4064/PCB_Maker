@@ -1,6 +1,6 @@
 # PCB Maker
-•Arduino based cnc/pcb plotter that uses python to read and send serial data to the Arduino.
-•Uses the [Adafruit MotorShield](https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino) and an [Arduino Mega](https://store.arduino.cc/usa/mega-2560-r3).
+•Arduino based cnc/pcb plotter that uses python to read and send serial data to the Arduino.<br/>
+•Uses the [Adafruit MotorShield](https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino) and an [Arduino Mega](https://store.arduino.cc/usa/mega-2560-r3).<br/>
 
 
 ## Python
