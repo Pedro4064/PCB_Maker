@@ -57,6 +57,9 @@ void loop()
 
                 // calculate the speeds for each stepper and save them to the struct
                 calculate_speed(&next_coord, &last_coord, &steppers_speeds, 255);
+
+                // Move the steppers 
+                move_steppers( xMotor, yMotor, &steppers_speeds, &last_coord, &next_coord);
                 break;
             
             default:

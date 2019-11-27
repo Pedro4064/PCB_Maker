@@ -16,7 +16,7 @@ struct speed
     float ySpeed;
 };
 
-float module(float a)
+inline float module(float a)
 {
     if (a<0)
     {
@@ -118,27 +118,73 @@ void calculate_speed(coordinates* next_coordinate, coordinates* current_coordina
 void move_steppers(Adafruit_StepperMotor* x_stepper, Adafruit_StepperMotor* y_stepper, speed* steppers_speed, coordinates* current_coordinates, coordinates* next_coordinates)
 {
     // number of steps to move one millimiter
-    float step = 10; //example number, needs to see the gear ration on the belt
+    float step_length = 10; //example number, needs to see the gear ration on the belt
 
-    float x_steps = next_coordinates->x - current_coordinates->x;
-    float y_steps = next_coordinates->y - current_coordinates->y;
+    float x_steps = (next_coordinates->x - current_coordinates->x) * step_length;
+    float y_steps = (next_coordinates->y - current_coordinates->y) * step_length;
 
     // Set the speed 
     x_stepper->setSpeed(steppers_speed->xSpeed);
     y_stepper->setSpeed(steppers_speed->ySpeed);
 
-    // Check to see which distance is smaller 
-    // determine if it is backwards or forward
-    if (x_steps<0)
+    // The direction of the steppers
+    uint8_t y_direction;
+    uint8_t x_direction;
+
+    // If the number of steps is negative, the direction is BACKWARD, else the direction is FORWARD
+    if (y_steps < 0)
     {
-        // Move the stepper motors 
-        x_stepper->step(module(x_steps), BACKWARD);
+        y_direction = BACKWARD;
     }
     else
     {
-        x_stepper->step(x_steps, FORWARD);
+        y_direction = FORWARD;
     }
     
 
+    if (x_steps < 0)
+    {
+        x_direction = BACKWARD;
+    }
+    else
+    {
+        x_direction = FORWARD;
+    }
+
+    
+    if (module(x_steps) > module(y_steps))
+    {
+        // Get the "slope", basically the ratio of x and y ---- Δx/Δy
+        float ratio = x_steps/y_steps;
+        
+        // command each step 
+        for (int step = 0; step<module(y_steps); step++)
+        {
+            // Move the y_stepper
+            y_stepper->step(1, y_direction, SINGLE);
+
+            // move the x stepper -- it will move more, but faster so the time it takes should be the same as the y stepper
+            x_stepper->step(ratio, x_direction, SINGLE);
+
+        }
+    }
+
+    else
+    {
+        // Get the "slope", basically the ratio of y and x ---- Δy/Δx
+        float ratio = y_steps/x_steps;
+
+        // Command each step
+        for (int step = 0; step<module(x_steps); step++)
+        {
+            // Move the x stepper
+            x_stepper->step(1,x_direction, SINGLE);
+
+            // move the y stepper -- it will move more, but faster so the time it takes should be the same as the y stepper
+            y_stepper->step(ratio, y_direction, SINGLE);
+            
+        }
+    }
+    
     
 }
